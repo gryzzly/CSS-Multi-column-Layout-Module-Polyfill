@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <style>* {margin:0;padding:0; line-height:1;}</style>
+</head>
+<body>
+<ul>
+  <li>Lorem</li>
+  <li>ipsum</li>
+  <li>dolor</li>
+  <li>sit</li>
+  <li>amet</li>
+  <li>consectetuer</li>
+  <li>Aliquam</li>
+  <li>tincidunt</li>
+  <li>mauris</li>
+  <li>eu</li>
+  <li>risus</li>
+</ul>
+<script src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
+<script>
+(function($){    
+  function columnCountSupported() {
+    var elem = document.createElement('ch'),
+        elemStyle = document.createElement('ch').style,
+        domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),
+        prop = 'columnCount',
+        uc_prop = prop.charAt(0).toUpperCase() + prop.substr(1),
+        props   = (prop + ' ' + domPrefixes.join(uc_prop + ' ') + uc_prop).split(' ');
+    
+    for ( var i in props ) {
+        if ( elemStyle[ props[i] ] !== undefined ) {
+            return true;
+        }
+    }
+    
+    return false;
+  }
+
+  $.fn.columnizeList = function(options) {
+
+    options = $.extend({}, $.fn.columnizeList.defaults, options);
+  
+    if (true) {
+      return this.each(function(){
+        var $this = $(this),
+            listClone = $this.clone(),
+            $items = $this.children('li'),
+            columnWidth,
+            columnHeight,
+            heightCounter = 16,
+            widthCounter = 0;
+
+        // clone to test the height of our list
+        listClone.css({
+          position:'absolute',
+          left:'-4999px'
+        });
+
+        // append the clone to the body, so it has dimensions
+        $('body').append(listClone);
+
+        columnWidth = Math.ceil(100 / (options.columnCount - options.columnGap));
+        columnHeight = Math.ceil(listClone.outerHeight() / options.columnCount);
+        console.log(columnHeight);
+
+        $items.each(function() {
+          var $item = $(this),
+              $itemHeight = $item.outerHeight();
+          heightCounter += $item.outerHeight();
+          // start new column
+          if (heightCounter > columnHeight) {
+            heightCounter = $itemHeight;
+            widthCounter += columnWidth;
+            $item.css('margin-top', -columnHeight+$itemHeight);
+          }
+          if (widthCounter > 0) {
+            $item.css('margin-left', columnWidth+'%');
+          }
+        });
+
+        $this.height(columnHeight);
+      });
+    }
+  };
+
+  $.fn.columnizeList.defaults = {
+    columnCount: 2,
+    columnGap: 0
+  };
+
+})(jQuery);
+$('ul').columnizeList();
+</script>
+</body>
+</html>
