@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8" />
     <title></title>
-    <style>* {margin:0;padding:0; line-height:1;}</style>
+    <style>
+    * {
+      margin:0;
+      padding:0; 
+      line-height:1;
+    } 
+    ul {
+      list-style:none;
+      -o-column-count:2;
+      -moz-column-count:2;
+      -webkit-column-count:2;
+    }
+    </style>
 </head>
 <body>
 <ul>
@@ -22,6 +34,7 @@
 <script src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
 <script>
 (function($){    
+  // from modernizr 
   function columnCountSupported() {
     var elem = document.createElement('ch'),
         elemStyle = document.createElement('ch').style,
@@ -39,52 +52,51 @@
     return false;
   }
 
-  $.fn.columnizeList = function(options) {
-
-    options = $.extend({}, $.fn.columnizeList.defaults, options);
-  
-    if (true) {
-      return this.each(function(){
-        var $this = $(this),
-            listClone = $this.clone(),
-            $items = $this.children('li'),
+  $.fn.columnizeList = function(settings){
+    
+    settings = $.extend($.fn.columnizeList.defaults, settings);
+    
+    if (!columnCountSupported()) {
+      return this.each(function() {
+        var $list = $(this),
+            // we create the clone of our list in order to test height/width
+            $listClone = $list.clone(),
+            $items = $list.children('li'),
+            itemsPerCol = Math.ceil($items.length / settings.columnCount),
             columnWidth,
             columnHeight,
-            heightCounter = 16,
+            itemHeight = 0,
             widthCounter = 0;
-
-        // clone to test the height of our list
-        listClone.css({
+            
+        // hide the clone from the viewport
+        $listClone.css({
           position:'absolute',
           left:'-4999px'
         });
 
         // append the clone to the body, so it has dimensions
-        $('body').append(listClone);
+        $('body').append($listClone);
 
-        columnWidth = Math.ceil(100 / (options.columnCount - options.columnGap));
-        columnHeight = Math.ceil(listClone.outerHeight() / options.columnCount);
-        console.log(columnHeight);
+        heightCounter = itemHeight = $listClone.find('li').first().outerHeight();
+        columnHeight = itemsPerCol * itemHeight;
+        columnWidth =  Math.floor(100 / settings.columnCount);
 
-        $items.each(function() {
-          var $item = $(this),
-              $itemHeight = $item.outerHeight();
-          heightCounter += $item.outerHeight();
-          // start new column
-          if (heightCounter > columnHeight) {
-            heightCounter = $itemHeight;
+        $items.each(function(i) {
+          var $item = $(this);
+
+          // new column
+          if (i > 0 && i % itemsPerCol == 0) {
             widthCounter += columnWidth;
-            $item.css('margin-top', -columnHeight+$itemHeight);
+            $item.css('margin-top', -columnHeight);
           }
           if (widthCounter > 0) {
-            $item.css('margin-left', columnWidth+'%');
+            $item.css('margin-left', widthCounter+'%');
           }
         });
-
-        $this.height(columnHeight);
       });
     }
   };
+
 
   $.fn.columnizeList.defaults = {
     columnCount: 2,
@@ -92,6 +104,7 @@
   };
 
 })(jQuery);
+
 $('ul').columnizeList();
 </script>
 </body>
