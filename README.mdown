@@ -1,4 +1,4 @@
 CSS Multi-column Layout Module JavaScript Substitute
 ====================================================
 
-http://jsfiddle.net/gryzzly/Umz6a/
+(http://jsfiddle.net/gryzzly/Umz6a/)[http://jsfiddle.net/gryzzly/Umz6a/]
